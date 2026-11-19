@@ -40,6 +40,5 @@ Row numbering: 1-based data record for CSV/JSONL/TXT (marker and header excluded
 
 ## Tools used
 
-- **Qoder AI coding assistant** — implementation, test scaffolding, and README drafting.
 - **Python standard library only** (`dataclasses`, `json`, `csv`, `re`, `datetime`, `bisect`, `statistics`); no runtime network or model calls.
 - **`mock_llm.py` / `schema.json`** — optional, constrained LLM tie-break path.
