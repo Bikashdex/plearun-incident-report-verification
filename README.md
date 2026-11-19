@@ -34,8 +34,8 @@ Each finding is one JSON object. Four verdicts: `match` (records support the cla
 ## Quick start
 
 `bash
-python3 plearun_cli.py reports/report_fictional_02.txt records > findings.json
-make test        # 30 offline tests; standard library only
+ python3 plearun_cli.py reports/report_fictional_02.txt records > findings.json
+ make test        # 30 offline tests; standard library only
 `
 
 Python 3.8+, stdlib only, no network, no LLM. (Windows: use `python`.) `--llm` enables the optional `mock_llm.py` tie-break; output is identical without it.
