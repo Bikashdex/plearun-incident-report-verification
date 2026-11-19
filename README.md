@@ -14,7 +14,7 @@ Checks every factual claim in an incident report against the machine records and
 | Near mile marker 4 | `not_checkable` | no location field in records |
 | "Only car in the lane" | `not_checkable` | subjective; not recorded |
 
-Claim-by-claim detail and clock math: [DEMO.md](DEMO.md).
+Claims are abbreviated; exact text is in `findings.json`. Claim-by-claim detail and clock math: [DEMO.md](DEMO.md).
 
 ```bash
 python3 plearun_cli.py reports/report_fictional_02.txt records > findings.json
@@ -36,7 +36,7 @@ Row numbering: 1-based data record for CSV/JSONL/TXT (marker/header excluded), e
 ## Three hardest decisions
 
 - **Clock trust hierarchy.** Alignment needs a repeatable anchor; nearest-event guesses invent precision. The bodycam stays unaligned when its anchors contradict, and unaligned evidence can support a match, never a conflict.
-- **Conservative conflicts.** A wrong conflict is worse than no answer. Conflicts need authoritative dispatch data or clock-trusted nearby camera evidence; the sample correctly yields zero.
+- **Conservative conflicts.** A wrong conflict is worse than no answer. Conflicts need authoritative dispatch data or clock-trusted nearby camera evidence; nothing in the sample is clearly contradicted, so it yields zero.
 - **Records are data.** Record text cannot steer the tool. The optional LLM only ranks pre-computed candidate row IDs; the quote gate re-checks its choice.
 
 ## What it gets wrong

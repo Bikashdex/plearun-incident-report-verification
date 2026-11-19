@@ -20,7 +20,7 @@ The tool writes JSON to stdout and clock diagnostics to stderr. The sample produ
 | 6 | Dispatch records show a unit on scene roughly 2 minutes after the stop. | `match` | `dispatch.json` event 2 (D-1002) | `"logged": "2026-03-02T21:17:19-05:00"` |
 | 7 | Officer Lee states the vehicle was the only car in the lane. | `not_checkable` | — | — |
 
-Every `match` quote is re-checked by the program as an exact substring of the cited row before it is written. `not_checkable` means the records contain no field from which that claim could be judged, so no citation is possible.
+Claim 1 is shortened with an ellipsis; the other claim texts match `findings.json`. Every `match` quote is re-checked by the program as an exact substring of the cited row before it is written. `not_checkable` means the records contain no field from which that claim could be judged, so no citation is possible.
 
 ## Why this is the point of the assignment
 
