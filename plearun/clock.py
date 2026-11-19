@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from typing import List, Optional
 
-from .keywords import CALL_RE, STOP_RE, STRONG_CALL_RE, event_type_matches
+from .keywords import STOP_RE, STRONG_CALL_RE, event_type_matches
 from .loader import Event
 from .timestamps import (
     clock_spread,
