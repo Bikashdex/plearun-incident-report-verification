@@ -31,16 +31,23 @@ Each finding is one JSON object. Four verdicts: `match` (records support the cla
 }
 `
 
-## Quick start | To Run it
+## Quick start 
+To run it (Python 3.8+, no install step, no API key):
 
-macOS / Linux:
+  git clone https://github.com/Bikashdex/plearun-incident-report-verification.git
+  cd plearun-incident-report-verification
+
+  macOS / Linux:
     python3 plearun_cli.py reports/report_fictional_02.txt records > findings.json
     make test
- 
+
   Windows (PowerShell or CMD):
     python plearun_cli.py reports/report_fictional_02.txt records > findings.json
     python -m unittest discover -s tests -v
- 
+
+Either path produces 7 findings: 5 match, 2 not_checkable, 0 conflict.
+The test suite is 30 tests and runs fully offline.
+
 Either path produces 7 findings: 5 match, 2 not_checkable, 0 conflict.
 The test suite is 30 tests and runs fully offline.
 
