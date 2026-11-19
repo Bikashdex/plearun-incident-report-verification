@@ -1,8 +1,10 @@
-# Plearun — report vs. records checker
+# Plearun — Incident Report Verification Tool
 
-Incident reports and their machine records do not share a clock. This tool reconstructs the offsets, checks every factual claim, and prints one JSON finding per claim with the exact row it relied on.
+Incident reports and their machine records do not share a clock. This tool reconstructs the offsets, checks every factual claim in the report against the records, and prints one JSON finding per claim — with the exact row it relied on.
 
-**Sample result — 7 claims: 5 `match`, 2 `not_checkable`, 0 `conflict`.** Every citation was re-verified as an exact substring of the cited row.
+## Sample result
+
+**7 claims: 5 `match`, 2 `not_checkable`, 0 `conflict`.**
 
 | Claim | Verdict | Evidence |
 |---|---|---|
@@ -14,29 +16,44 @@ Incident reports and their machine records do not share a clock. This tool recon
 | Near mile marker 4 | `not_checkable` | no location field in records |
 | "Only car in the lane" | `not_checkable` | subjective; not recorded |
 
-Claims are abbreviated; exact text is in `findings.json`. Claim-by-claim detail and clock math: [DEMO.md](DEMO.md).
+Claims abbreviated; exact text in `findings.json`. Full walkthrough with clock math: [DEMO.md](DEMO.md).
 
-```bash
+## Output format
+
+Each finding is one JSON object. Four verdicts: `match` (records support the claim), `conflict` (records clearly contradict it), `not_settled` (evidence exists but is not decisive), `not_checkable` (records lack that kind of fact). `cite` and `quote` appear only for `match` and `conflict`.
+
+`json
+{
+  "claim": "Officer Lee first observed the blue sedan at about 21:14 ...",
+  "finding": "match",
+  "cite": {"file": "notes_cp1252.csv", "row": 1},
+  "quote": "N-1,Officer Lee,\"Vehicle observed, plate unknown\",21:15"
+}
+`
+
+## Quick start
+
+`bash
 python3 plearun_cli.py reports/report_fictional_02.txt records > findings.json
 make test        # 30 offline tests; standard library only
-```
+`
 
-Python 3.8+, stdlib only; no network or LLM. (Windows: use `python`.) `--llm` enables the optional `mock_llm.py` tie-break; output is identical without it.
+Python 3.8+, stdlib only, no network, no LLM. (Windows: use `python`.) `--llm` enables the optional `mock_llm.py` tie-break; output is identical without it.
 
 ## How it works
 
-1. **Load** `.csv`, `.json`, `.jsonl`, `.vtt`, `.txt` with `utf-8-sig → utf-8 → cp1252 → latin-1`, normalise CRLF, keep file/row/raw text.
-2. **Parse** timestamps to seconds-of-day: epoch s/ms/µs, ISO with/without offset, naive ISO, `HH:MM`, dotted A.M./P.M., WebVTT. Naive times stay wall-clock, never machine-local.
-3. **Align clocks** (`clock.py`): dispatch is the reference; notes shift on the shared 911 call; camera skews come from zero-speed rows anchored to the corrected stop. Bodycam aligns only if its weighted anchors agree within 120 s (weight ≥ 2), else it stays unaligned.
-4. **Extract and verify** (`claims.py`, `verify.py`): speed/zone, times, delays, counts, mile markers. Tolerances: 90 s bare, 120 s hedged, 30 s with seconds; delay `max(60 s, 25%)`; speed ±0.5 mph. `conflict` needs authoritative dispatch (>300 s) or a trusted nearby camera (>8 mph).
-5. **Quote gate** (`pipeline.py`): each `match`/`conflict` quote must be an exact substring of the cited row, else it is downgraded to `not_settled`.
+1. **Load** every file in the records directory (`.csv`, `.json`, `.jsonl`, `.vtt`, `.txt`). Decode BOM, Windows-1252, and CRLF. Keep each event's file, row, and raw text.
+2. **Parse timestamps** into seconds-of-day: epoch s/ms/µs, ISO with/without offset, naive ISO, `HH:MM`, dotted A.M./P.M., WebVTT cue times. Naive times stay wall-clock, never machine-local.
+3. **Align clocks** (`clock.py`): dispatch is the reference. Notes shift via the shared 911 call. Camera skews come from zero-speed rows anchored to the corrected stop. Bodycam aligns only if its anchors agree; otherwise it stays unaligned.
+4. **Extract claims** from the report (`claims.py`): speed/zone, clock times, elapsed delays, counts, mile markers.
+5. **Verify** each claim against the aligned records (`verify.py`). Before any `match`/`conflict` is written, the quote is re-checked as an exact substring of the cited row; if it fails, the finding is downgraded to `not_settled` (`pipeline.py`).
 
 Row numbering: 1-based data record for CSV/JSONL/TXT (marker/header excluded), event for JSON, cue for WebVTT.
 
 ## Three hardest decisions
 
 - **Clock trust hierarchy.** Alignment needs a repeatable anchor; nearest-event guesses invent precision. The bodycam stays unaligned when its anchors contradict, and unaligned evidence can support a match, never a conflict.
-- **Conservative conflicts.** A wrong conflict is worse than no answer. Conflicts need authoritative dispatch data or clock-trusted nearby camera evidence; nothing in the sample is clearly contradicted, so it yields zero.
+- **Conservative conflicts.** A wrong conflict is worse than no answer. Nothing in the sample is clearly contradicted, so it yields zero conflicts while still confirming five claims.
 - **Records are data.** Record text cannot steer the tool. The optional LLM only ranks pre-computed candidate row IDs; the quote gate re-checks its choice.
 
 ## What it gets wrong
@@ -45,10 +62,10 @@ Row numbering: 1-based data record for CSV/JSONL/TXT (marker/header excluded), e
 - Multi-number sentences or typos like "85 in a 45" can bind the wrong candidate.
 - A constant clock skew is assumed; drifting devices stay unaligned.
 
-## What breaks first
+## What breaks first on real records
 
 - **Schema drift** in camera logs or JSON keys: fails safely, coverage drops.
-- **Clock drift** over long recordings.
+- **Clock drift** over long recordings, where one offset no longer fits.
 - **Paraphrased or compound sentences** sharing one time context.
 
 ## Tools used
