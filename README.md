@@ -1,6 +1,6 @@
 # Plearun — report vs. records checker
 
-Checks every factual claim in an incident report against the machine records and prints one JSON finding per claim.
+Incident reports and their machine records do not share a clock. This tool reconstructs the offsets, checks every factual claim, and prints one JSON finding per claim with the exact row it relied on.
 
 **Sample result — 7 claims: 5 `match`, 2 `not_checkable`, 0 `conflict`.** Every citation was re-verified as an exact substring of the cited row.
 
