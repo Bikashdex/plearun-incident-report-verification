@@ -4,7 +4,7 @@ Incident reports and their machine records do not share a clock. This tool recon
 
 ## Sample result
 
-**7 claims: 5 `match`, 2 `not_checkable`, 0 `conflict`.**
+**7 claims: 5 `match`, 2 `not_checkable`, 0 `conflict`.** Every citation was re-verified as an exact substring of the cited row.
 
 | Claim | Verdict | Evidence |
 |---|---|---|
@@ -20,38 +20,41 @@ Claims abbreviated; exact text in `findings.json`. Full walkthrough with clock m
 
 ## Output format
 
-Each finding is one JSON object. Four verdicts: `match` (records support the claim), `conflict` (records clearly contradict it), `not_settled` (evidence exists but is not decisive), `not_checkable` (records lack that kind of fact). `cite` and `quote` appear only for `match` and `conflict`.
+Four verdicts: `match` (records support the claim), `conflict` (records clearly contradict it), `not_settled` (evidence exists but is not decisive), `not_checkable` (records lack that kind of fact). `cite` and `quote` appear only for `match` and `conflict`.
 
-`json
+```json
 {
   "claim": "Officer Lee first observed the blue sedan at about 21:14 ...",
   "finding": "match",
   "cite": {"file": "notes_cp1252.csv", "row": 1},
   "quote": "N-1,Officer Lee,\"Vehicle observed, plate unknown\",21:15"
 }
-`
+```
 
-## Quick start 
-To run it (Python 3.8+, no install step, no API key):
+## Quick start
 
-  git clone https://github.com/Bikashdex/plearun-incident-report-verification.git
-  cd plearun-incident-report-verification
+```bash
+git clone https://github.com/Bikashdex/plearun-incident-report-verification.git
+cd plearun-incident-report-verification
+```
 
-  macOS / Linux:
-    python3 plearun_cli.py reports/report_fictional_02.txt records > findings.json
-    make test
+**macOS / Linux:**
 
-  Windows (PowerShell or CMD):
-    python plearun_cli.py reports/report_fictional_02.txt records > findings.json
-    python -m unittest discover -s tests -v
+```bash
+python3 plearun_cli.py reports/report_fictional_02.txt records > findings.json
+make test        # 30 offline tests; standard library only
+```
 
-Either path produces 7 findings: 5 match, 2 not_checkable, 0 conflict.
-The test suite is 30 tests and runs fully offline.
+**Windows (PowerShell or CMD):**
 
-Either path produces 7 findings: 5 match, 2 not_checkable, 0 conflict.
-The test suite is 30 tests and runs fully offline.
+```bash
+python plearun_cli.py reports/report_fictional_02.txt records > findings.json
+python -m unittest discover -s tests -v
+```
 
-Python 3.8+, stdlib only, no network, no LLM. (Windows: use `python`.) `--llm` enables the optional `mock_llm.py` tie-break; output is identical without it.
+Either path produces 7 findings: 5 match, 2 not_checkable, 0 conflict. The test suite is 30 tests and runs fully offline.
+
+Python 3.8+, stdlib only, no network, no LLM. `--llm` enables the optional `mock_llm.py` tie-break; output is identical without it.
 
 ## How it works
 
